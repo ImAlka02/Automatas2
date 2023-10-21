@@ -2,77 +2,144 @@
 using System.ComponentModel.Design;
 using System.Linq;
 
-Console.WriteLine("ELige a que quieres convertir tu notacion Infija:");
+
+Console.WriteLine("Conversiones disponibles de Infija a:");
 Console.WriteLine("1 -- Prefija");
-Console.WriteLine("2 -- Posfija");
-
-Stack pila = new();
-string o = "()-+*/";
-string Resultado = "";
+Console.WriteLine("2 -- Postfija");
+Console.WriteLine("ELige a que quieres convertir tu notacion Infija:");
 int opcion = int.Parse(Console.ReadLine());
-string infija = Console.ReadLine();
 
-
-if (opcion == 1) 
+while (opcion != 0 && opcion < 3)
 {
-    for (int i = infija.Length-1; i >=0; i--)
+    Console.WriteLine("Ingrese la notacion Infija:");
+    string infija = Console.ReadLine();
+    if (opcion == 1)
     {
-        if (o.Contains(infija[i]))
-        {
-            if (infija[i] == '(')
-            {
-                Resultado = Resultado + pila.Pop();
-                pila.Pop();
-            }
-            else
-            {
-                pila.Push(infija[i]);
-            }
-        }
-        else
-        {
-            Resultado = Resultado + infija[i];
-        }
+        Console.WriteLine(InfijaToPrefija(infija));
     }
-    if (pila.Count == 1) Resultado = Resultado + pila.Pop();
-
-    Resultado = ReverseString(Resultado);
-} 
-else if( opcion == 2)
-{
-    for (int i = 0; i < infija.Length; i++)
+    else if (opcion == 2)
     {
-        if (o.Contains(infija[i]))
-        {
-            if (infija[i] == ')')
-            {
-                Resultado = Resultado + pila.Pop();
-                pila.Pop();
-            }
-            else
-            {
-                pila.Push(infija[i]);
-            }
-
-        }
-        else
-        {
-            Resultado = Resultado + infija[i];
-        }
-
-
+        Console.WriteLine(InfijaToPostfija(infija));
     }
-    if (pila.Count == 1) Resultado = Resultado + pila.Pop();
+
+    infija = "";
+    Console.WriteLine("ELige a que quieres convertir tu notacion Infija:");
+    opcion = int.Parse(Console.ReadLine());
 }
 
 
+static int valor(char operador)
+{
+	switch (operador)
+	{
+		case '*' :
+			return 3;
+			break;
+        case '/':
+            return 3;
+            break;
+        case '-':
+            return 4;
+            break;
+        case '+':
+            return 4;
+            break;
 
-Console.WriteLine(Resultado);
+        default: 
+			return int.MaxValue;
+	}
+}
 
+static bool EsOperador(char operador)
+{
+    return (operador >= 'a' && operador <= 'z') || (operador >= 'A' && operador <= 'Z') || (operador >= '1' && operador <= '9');
+}
 
 static string ReverseString(string input)
 {
     char[] charArray = input.ToCharArray();
     Array.Reverse(charArray);
     return new string(charArray);
+}
+
+static string InfijaToPostfija (string infija)
+{
+    Stack<char> pila = new();
+    string postfija = "";
+
+    foreach (char c in infija)
+    {
+        if(c == '(')
+        {
+            pila.Push(c);
+        }
+        else if (c==')')
+        {
+            while (pila.Peek() != '(') 
+            {
+                postfija += pila.Pop();
+            }
+            pila.Pop();
+        }
+        else if (EsOperador(c))
+        {
+            postfija += c;
+        }
+        else
+        {
+            while(pila.Count != 0 && valor(c) >= valor(pila.Peek()))
+            {
+                postfija += pila.Pop();
+            }
+            pila.Push(c);
+        }
+        
+    }
+    while (pila.Count != 0)
+    {
+        postfija += pila.Pop();
+    }
+    return "Postfija: "+postfija;
+}
+
+static string InfijaToPrefija(string infija)
+{
+    Stack<char> pila = new();
+    string prefija = "";
+     
+    infija = ReverseString(infija);
+
+    foreach (char c in infija)
+    {
+        if (c == ')')
+        {
+            pila.Push(c);
+        }
+        else if (c == '(')
+        {
+            while (pila.Peek() != ')')
+            {
+                prefija += pila.Pop();
+            }
+            pila.Pop();
+        }
+        else if (EsOperador(c))
+        {
+            prefija += c;
+        }
+        else
+        {
+            while (pila.Count != 0 && valor(c) >= valor(pila.Peek()))
+            {
+                prefija += pila.Pop();
+            }
+            pila.Push(c);
+        }
+
+    }
+    while (pila.Count != 0)
+    {
+        prefija += pila.Pop();
+    }
+    return "Prefija: " + ReverseString(prefija);
 }
