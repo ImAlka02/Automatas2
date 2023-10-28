@@ -32,6 +32,9 @@ static int valor(char operador)
 {
 	switch (operador)
 	{
+        case '^':
+            return 2;
+            break;
 		case '*' :
 			return 3;
 			break;
